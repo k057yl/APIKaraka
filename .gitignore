@@ -1,0 +1,10 @@
+# Backend
+bin/
+obj/
+appsettings.json
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.cache
