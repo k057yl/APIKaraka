@@ -5,10 +5,28 @@ using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// =================================================================
+// 1. КОНФИГУРАЦИЯ СЕРВИСОВ
+// =================================================================
+
 builder.Services.AddAppServices(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// --- ДОБАВЛЕНИЕ СЕРВИСА CORS ---
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200",
+                               "https://<URL>.onrender.com")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+});
 
 var app = builder.Build();
 
@@ -38,6 +56,10 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// =================================================================
+// 2. КОНФИГУРАЦИЯ MIDDLEWARE
+// =================================================================
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -45,7 +67,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseCors("AllowAngular");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
