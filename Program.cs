@@ -21,7 +21,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins("http://localhost:4200",
-                               "https://<URL>.onrender.com")
+                               "https://k057yl.github.io")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
