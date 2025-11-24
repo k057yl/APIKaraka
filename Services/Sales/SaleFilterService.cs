@@ -13,18 +13,15 @@ namespace APIKarakatsiya.Services.Sales
             _context = context;
         }
 
-        public async Task<List<SaleDto>> FilterAsync(SaleFilterDto filter)
+        public async Task<SaleFilterResultDto> FilterAsync(SaleFilterDto filter)
         {
             var query = _context.Sales
                 .Include(s => s.Item)
                     .ThenInclude(i => i.Photos)
                 .AsQueryable();
 
-            // если передан userId и пользователь не admin, фильтруем
             if (!string.IsNullOrEmpty(filter.UserId))
-            {
                 query = query.Where(s => s.UserId == filter.UserId);
-            }
 
             if (filter.MinProfit.HasValue)
                 query = query.Where(s => s.Profit >= filter.MinProfit.Value);
@@ -50,7 +47,7 @@ namespace APIKarakatsiya.Services.Sales
                 };
             }
 
-            return await query
+            var sales = await query
                 .Select(s => new SaleDto
                 {
                     Id = s.Id,
@@ -64,6 +61,14 @@ namespace APIKarakatsiya.Services.Sales
                     UserId = s.UserId
                 })
                 .ToListAsync();
+
+            var totalProfit = sales.Sum(s => s.Profit);
+
+            return new SaleFilterResultDto
+            {
+                Sales = sales,
+                TotalProfit = totalProfit
+            };
         }
     }
 }
